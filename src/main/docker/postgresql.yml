@@ -1,0 +1,11 @@
+version: '2'
+services:
+  zcntech-postgresql:
+    image: zcntech:12.3
+    # volumes:
+    #     - ~/volumes/jhipster/zcntech/postgresql/:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=zcntech
+      - POSTGRES_PASSWORD=m0320532
+    ports:
+      - 5432:5432

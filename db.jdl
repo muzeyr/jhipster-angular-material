@@ -1,0 +1,30 @@
+
+entity Customer {
+	name String required,
+    code String required,
+    phone String required
+}
+
+entity Product {
+	name String,
+    code String,
+    price Long
+}
+entity CustomerOrder {
+	price Long,
+    sysDate Instant
+}
+
+relationship OneToOne {
+	CustomerOrder{customer} to Customer,
+	CustomerOrder{product} to Product
+}
+
+paginate CustomerOrder,  Product, Customer with infinite-scroll
+paginate Product with pagination
+
+service all with serviceImpl except Product, CustomerOrder, Customer
+
+filter Customer
+filter Product
+filter CustomerOrder
