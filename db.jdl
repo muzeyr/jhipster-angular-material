@@ -15,7 +15,7 @@ entity CustomerOrder {
     sysDate Instant
 }
 
-relationship OneToOne {
+relationship ManyToMany {
 	CustomerOrder{customer} to Customer,
 	CustomerOrder{product} to Product
 }
