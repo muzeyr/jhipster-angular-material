@@ -34,8 +34,7 @@ export class CustomerOrderUpdateComponent implements OnInit {
     id: [],
     price: [],
     sysDate: [],
-    customer: [],
-    customerObj: [],
+    customer: [], 
     product: [],
   });
 
@@ -57,21 +56,28 @@ export class CustomerOrderUpdateComponent implements OnInit {
           this.isLoading = true;
         }),
         switchMap(value => {
-          let criteria = {
-            'name.contains' : value.name ?  value.name: value
-         };
+          let criteria 
+          if(value){
+              criteria = {
+              'name.contains' : value.name ?  value.name: value
+           };
+            
+          } 
+          criteria = {
+            'customerOrderId.specified': 'false' 
+          };
           return this.customerService.query(criteria)
-          .pipe(
-            finalize(() => {
-              console.log(2);
-              this.isLoading = false;
-            }),
-          )
+            .pipe(
+              finalize(() => {
+                console.log(2);
+                this.isLoading = false;
+              }),
+            )
+         
         }
         )
       )
       .subscribe(data => {
-        console.log(data);
          this.customers = data.body? data.body: [];
       }, error => {
         this.customers = [];
@@ -193,7 +199,6 @@ export class CustomerOrderUpdateComponent implements OnInit {
       if (item.id === uuid) {
           this.selectedCustomer = item;
           this.editForm.get('customer')?.setValue(item.name);
-          this.editForm.get('customerObj')?.setValue(item);
           return;
       }
   });
