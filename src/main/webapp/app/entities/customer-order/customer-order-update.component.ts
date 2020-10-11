@@ -15,6 +15,8 @@ import { CustomerService } from 'app/entities/customer/customer.service';
 import { IProduct } from 'app/shared/model/product.model';
 import { ProductService } from 'app/entities/product/product.service';
 
+import { debounceTime, tap, switchMap, finalize } from 'rxjs/operators';
+
 type SelectableEntity = ICustomer | IProduct;
 
 @Component({
@@ -25,12 +27,15 @@ export class CustomerOrderUpdateComponent implements OnInit {
   isSaving = false;
   customers: ICustomer[] = [];
   products: IProduct[] = [];
+  isLoading: boolean = false;
+  selectedCustomer: any;
 
   editForm = this.fb.group({
     id: [],
     price: [],
     sysDate: [],
     customer: [],
+    customerObj: [],
     product: [],
   });
 
@@ -43,6 +48,34 @@ export class CustomerOrderUpdateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
+    this.editForm.controls['customer'].valueChanges
+      .pipe(
+        debounceTime(100),
+        tap(() => {
+          this.customers = [];
+          this.isLoading = true;
+        }),
+        switchMap(value => {
+          let criteria = {
+            'name.contains' : value.name ?  value.name: value
+         };
+          return this.customerService.query(criteria)
+          .pipe(
+            finalize(() => {
+              console.log(2);
+              this.isLoading = false;
+            }),
+          )
+        }
+        )
+      )
+      .subscribe(data => {
+        console.log(data);
+         this.customers = data.body? data.body: [];
+      }, error => {
+        this.customers = [];
+      });
     this.activatedRoute.data.subscribe(({ customerOrder }) => {
       if (!customerOrder.id) {
         const today = moment().startOf('day');
@@ -102,7 +135,7 @@ export class CustomerOrderUpdateComponent implements OnInit {
       id: customerOrder.id,
       price: customerOrder.price,
       sysDate: customerOrder.sysDate ? customerOrder.sysDate.format(DATE_TIME_FORMAT) : null,
-      customer: customerOrder.customer,
+      customer: customerOrder.customer?.name,
       product: customerOrder.product,
     });
   }
@@ -114,6 +147,7 @@ export class CustomerOrderUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const customerOrder = this.createFromForm();
+    customerOrder.customer = this.selectedCustomer;
     if (customerOrder.id !== undefined) {
       this.subscribeToSaveResponse(this.customerOrderService.update(customerOrder));
     } else {
@@ -151,4 +185,19 @@ export class CustomerOrderUpdateComponent implements OnInit {
   trackById(index: number, item: SelectableEntity): any {
     return item.id;
   }
+
+  public onTypeChange(uuid: number): void {
+   
+    this.customers.forEach(item => {
+      
+      if (item.id === uuid) {
+          this.selectedCustomer = item;
+          this.editForm.get('customer')?.setValue(item.name);
+          this.editForm.get('customerObj')?.setValue(item);
+          return;
+      }
+  });
+ 
+  }
+
 }

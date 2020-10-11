@@ -99,6 +99,7 @@ public class CustomerResource {
     @GetMapping("/customers")
     public ResponseEntity<List<Customer>> getAllCustomers(CustomerCriteria criteria, Pageable pageable) {
         log.debug("REST request to get Customers by criteria: {}", criteria);
+        log.info("INFOOOOO");
         Page<Customer> page = customerQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());

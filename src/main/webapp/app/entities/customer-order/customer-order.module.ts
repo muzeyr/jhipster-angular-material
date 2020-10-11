@@ -6,7 +6,7 @@ import { CustomerOrderComponent } from './customer-order.component';
 import { CustomerOrderDetailComponent } from './customer-order-detail.component';
 import { CustomerOrderUpdateComponent } from './customer-order-update.component';
 import { CustomerOrderDeleteDialogComponent } from './customer-order-delete-dialog.component';
-import { customerOrderRoute } from './customer-order.route';
+import { customerOrderRoute } from './customer-order.route'; 
 
 @NgModule({
   imports: [ZcntechSharedModule, RouterModule.forChild(customerOrderRoute)],
